@@ -71,6 +71,7 @@ DocuAI 是一款先进的人工智能文档解析工具，它能够理解和处理各种格式的文档，包括PDF
 ### 3.1 打包应用
 ```
 # 应用打包
-pyinstaller --windowed --hidden-import=tiktoken_ext.openai_public --hidden-import=tiktoken_ext --icon=app.ico DocuAI.py
+C:\Users\rxw1198\.conda\envs\document_summary\Lib\site-packages\pydantic
+pyinstaller --windowed --hidden-import=pydantic.deprecated.decorator --icon=app.ico DocuAI.py
 ```
 #DocuAI

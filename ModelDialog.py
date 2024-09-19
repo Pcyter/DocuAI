@@ -1,3 +1,4 @@
+import logging
 import traceback
 
 from PySide6.QtCore import QTimer, Signal, Slot
@@ -9,7 +10,8 @@ from langchain_core.prompts import PromptTemplate
 
 from template import MODEL_DIALOG_TEMPLATE
 from util import getChainLLM, getLLM
-
+from logging.config import fileConfig
+import logging
 
 class ModelDialogWindow(QWidget):
     update_text_signal = Signal(str)  # 定义一个信号，当需要更新文本时发射
@@ -20,6 +22,23 @@ class ModelDialogWindow(QWidget):
         self.initUI()
         self.init_signal_slot()
 
+        self.initLogger()
+
+    def initLogger(self):
+        # 配置日志
+        logging.basicConfig(level=logging.INFO)
+        # 创建一个日志器
+        # 将配置文件字符串载入配置
+        # logging_config = configparser.ConfigParser()
+        logging.config.fileConfig("logging.conf")
+
+        # 获取配置好的日志记录器
+        self.logger = logging.getLogger("Logger")
+        self.logger.debug('debug')
+        self.logger.info('info')
+        self.logger.warning('warn')
+        self.logger.error('error')
+        self.logger.critical('critical')
     def initLLM(self,net,url,api_key,model):
         prompt = PromptTemplate.from_template(MODEL_DIALOG_TEMPLATE)
 
@@ -105,18 +124,22 @@ class ModelDialogWindow(QWidget):
                 self.resp_list.clear()
                 print(f"Error : {e}")
                 traceback.print_exc()
+                self.logger.error(str(e))
 
 
     def send_dialog(self):
         dialog_text = self.dialog_entry.text()
-        self.historys.append(f"\n question:{dialog_text}")
-        self.historys.append(f"\n answer:")
-        try:
-            self.response = self.chain.stream({"question":dialog_text,"history":self.historys})
-            self.dialog_entry.setText("")
-            self.web_view.append(f"😜：{dialog_text}")
-            self.web_view.append("".join("🤖："))  # 发射信号
-            self.markdown_text = self.web_view.toHtml()
+        self.logger.error(f"user question is {dialog_text}")
+        if len(dialog_text)>0:
+            self.historys.append(f"\n question:{dialog_text}")
+            self.historys.append(f"\n answer:")
+            try:
+                self.response = self.chain.stream({"question":dialog_text,"history":self.historys})
+                self.dialog_entry.setText("")
+                self.web_view.append(f"😜：{dialog_text}")
+                self.web_view.append("".join("🤖："))  # 发射信号
+                self.markdown_text = self.web_view.toHtml()
 
-        except Exception as e:
-            QMessageBox.critical(self, "错误", str(e))
+            except Exception as e:
+                QMessageBox.critical(self, "错误", str(e))
+                self.logger.error(f"错误{str(e)}")

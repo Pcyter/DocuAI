@@ -1,0 +1,10 @@
+2024-09-19 15:02:08,649 - myLogger - DEBUG - debug
+2024-09-19 15:02:08,649 - myLogger - INFO - info
+2024-09-19 15:02:08,649 - myLogger - WARNING - warn
+2024-09-19 15:02:08,650 - myLogger - ERROR - error
+2024-09-19 15:02:08,650 - myLogger - CRITICAL - critical
+2024-09-19 15:02:21,201 - myLogger - INFO - 读取文件docs信息，数据量:1
+2024-09-19 15:02:21,202 - myLogger - INFO - 开始分析docs信息……
+2024-09-19 15:02:21,202 - myLogger - INFO - stuff_chain 开始模型对话
+2024-09-19 15:02:21,202 - myLogger - INFO - stuff_chain 完成模型对话
+2024-09-19 15:02:21,202 - myLogger - INFO - 结束docs信息分析

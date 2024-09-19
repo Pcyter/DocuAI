@@ -12,13 +12,35 @@ from ReadFile import parse_txt
 import configparser
 
 from util import openai_base_url
+import logging
+from logging.config import fileConfig
 
 
 class DialogApp(QWidget):
     def __init__(self):
         super().__init__()
+
         self.initUI()
+
         self.load_config()
+
+        self.initLogger()
+
+    def initLogger(self):
+        # 配置日志
+        logging.basicConfig(level=logging.INFO)
+        # 创建一个日志器
+        # 将配置文件字符串载入配置
+        # logging_config = configparser.ConfigParser()
+        logging.config.fileConfig("logging.conf")
+
+        # 获取配置好的日志记录器
+        logger = logging.getLogger("Logger")
+        logger.debug('debug')
+        logger.info('info')
+        logger.warning('warn')
+        logger.error('error')
+        logger.critical('critical')
 
     def initUI(self):
         self.setWindowTitle('主窗口')
