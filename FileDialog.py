@@ -9,6 +9,7 @@ from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 import chardet
 
 from ReadFile import parse_file, get_token_count, TOKEN_LIMIT, split_text_into_chunks, parse_file_documents
+from myLogger import logger
 from template import FILE_DIALOG_TEMPLATE
 from util import openai_base_url, getChainLLM, getLLM
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -25,19 +26,7 @@ class FileDialogWindow(QWidget):
         self.text = None
         self.initUI()
         self.init_signal_slot()
-        self.init_logger()
-    def init_logger(self):
-        # 配置日志
-        logging.basicConfig(level=logging.INFO)
-        logging.config.fileConfig("logging.conf")
 
-        # 获取配置好的日志记录器
-        self.logger = logging.getLogger("myLogger")
-        self.logger.debug('debug')
-        self.logger.info('info')
-        self.logger.warning('warn')
-        self.logger.error('error')
-        self.logger.critical('critical')
 
 
     def initLLM(self,net,url,api_key,model):
@@ -188,35 +177,36 @@ class FileDialogWindow(QWidget):
         try:
             # 弹出选择对话框
             file_path, _ = QFileDialog.getOpenFileName(self, "选择文件", "", "Supported Files (*.docx *.doc *.xlsx *.xls *.pdf *.txt)")
-            self.logger.info("选择要分析文件：",file_path)
+            logger.info(f"选择要分析文件：{file_path}")
             if file_path is not None and len(file_path) > 0:
                 self.file_flag = True
+                logger.info(f"self.file_flag：{self.file_flag}")
                 self.path_entry.setText(file_path)  # 将选择的文件路径显示在输入框中
                 # self.text = parse_file(file_path)
+                logger.info(f"开始读取文件docs信息")
+
                 self.docs = parse_file_documents(file_path)
-                self.logger.info(f"读取文件docs信息，数据量:{len(self.docs)}")
+                logger.info(f"读取文件docs信息，数据量:{len(self.docs)}")
                 self.browser_view.setMarkdown(self.markdown_text + "---")
                 self.browser_view.append("\n")
                 self.markdown_text = self.browser_view.toHtml()
 
-                self.logger.info(f"开始分析docs信息……")
+                logger.info(f"开始分析docs信息……")
 
                 # 对每个块进行模型推理处理
                 for doc in self.docs:
-                    self.logger.info("stuff_chain 开始模型对话")
+                    logger.info("stuff_chain 开始模型对话")
 
                     resp = self.stuff_chain.stream({"question": "对文档进行总结", "context": [doc], "history": ""})
-                    self.logger.info("stuff_chain 完成模型对话")
+                    logger.info("stuff_chain 完成模型对话")
 
                     self.response_list.append(resp)
 
-                self.logger.info(f"结束docs信息分析")
+                logger.info(f"结束docs信息分析")
 
         except Exception as e:
             QMessageBox.critical(self, "错误", str(e))
-            self.logger.error(f"错误{str(e)}")
-            self.logger.error(traceback.print_exc())
-            # 如果需要更详细的堆栈跟踪信息，可以使用以下代码
+            logger.error(f"错误{str(e)}")
 
 
 
@@ -225,7 +215,7 @@ class FileDialogWindow(QWidget):
         self.resp_list.clear()
         self.file_flag = False
         dialog_text = self.dialog_entry.text()
-        self.logger.info(f"user question is {dialog_text}")
+        logger.info(f"user question is {dialog_text}")
         if len(dialog_text)>0:
             self.dialog_entry.setText("")
             try:
@@ -240,13 +230,13 @@ class FileDialogWindow(QWidget):
 
             except Exception as e:
                 # 记录一条信息
-                self.logger.error(str(e))
+                logger.error(f"错误{str(e)}")
                 QMessageBox.critical(self, "错误", str(e))
 
 
     def open_file_func(self):
         self.file_path, _ = QFileDialog.getOpenFileName(self, "选择要编辑的md文件", "", "文件类型 (*.md)")
-        self.logger.info(f"File opened:{self.file_path}")
+        logger.info(f"File opened:{self.file_path}")
         # 首先检测文件编码
         with open(self.file_path, 'rb') as f:
             raw_data = f.read()
@@ -273,6 +263,6 @@ class FileDialogWindow(QWidget):
                 with open(fileName, 'w', encoding='utf-8') as f:
                     f.write(self.browser_view.toMarkdown())
             except UnicodeEncodeError as e:
-                self.logger.error(f"Error saving file:{e}")
+                logger.error(f"Error saving file:{e}")
 
-        self.logger.info(f"File saved:{fileName}")
+        logger.info(f"File saved:{fileName}")

@@ -4,8 +4,7 @@ from PySide6.QtWidgets import QTextEdit, \
     QTextBrowser, QVBoxLayout, QMenuBar, QMenu, QHBoxLayout, QWidget, QFileDialog
 from PySide6.QtGui import QIcon, QAction
 import chardet
-from logging.config import fileConfig
-import logging
+
 
 class MarkdownWindow(QWidget):
     def __init__(self):
@@ -13,24 +12,6 @@ class MarkdownWindow(QWidget):
 
         self.file_path = ""
         self.initUI()
-
-        self.initLogger()
-
-    def initLogger(self):
-        # 配置日志
-        logging.basicConfig(level=logging.INFO)
-        # 创建一个日志器
-        # 将配置文件字符串载入配置
-        # logging_config = configparser.ConfigParser()
-        logging.config.fileConfig("logging.conf")
-
-        # 获取配置好的日志记录器
-        logger = logging.getLogger("Logger")
-        logger.debug('debug')
-        logger.info('info')
-        logger.warning('warn')
-        logger.error('error')
-        logger.critical('critical')
 
     def initUI(self):
         self.setWindowTitle('markdown 文件编辑窗口')

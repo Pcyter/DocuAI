@@ -2,7 +2,6 @@ import argparse
 import os
 
 import chardet
-import langchain_core
 import pythoncom
 import tiktoken
 from docx import Document
@@ -10,6 +9,8 @@ from openpyxl import load_workbook
 from PyPDF2 import PdfReader
 from win32com.client import Dispatch
 from langchain_core.documents import Document as Doc
+
+from myLogger import logger
 
 # 定义大模型的token限制（例如GPT-4的token限制）
 TOKEN_LIMIT = 6000  # 假设模型最大支持6000个tokens
@@ -118,6 +119,7 @@ def parse_file(file_path):
     elif file_path.endswith(".txt"):
         return parse_txt(file_path)
     else:
+        logger.error(f"Unsupported file format: {file_path}")
         raise ValueError(f"Unsupported file format: {file_path}")
 
 
@@ -135,6 +137,7 @@ def walkFile(file):
 ##文件是否存在判别函数
 def file_exists(path):
     if not os.path.isfile(path):
+        logger.error("文件 %s 不存在!" % path)
         raise argparse.ArgumentTypeError("文件 %s 不存在!" % path)
     return path
 
@@ -142,15 +145,18 @@ def file_exists(path):
 ##目录是否存在判别函数
 def path_exists(path):
     if not os.path.isdir(path):
+        logger.error("目录 %s 不存在!" % path)
         raise argparse.ArgumentTypeError("目录 %s 不存在!" % path)
     return path
 
 def parse_file_documents(file_path):
     try:
         text_all = parse_file(file_exists(file_path))
+        logger.info("parse_file(file_exists(file_path)) end!")
         documents = []
         # 对每个块进行模型推理处理
         token_count = get_token_count(text_all)
+        logger.info("token_count: %d" % token_count)
         if token_count < TOKEN_LIMIT:
             documents.append(Doc(page_content=f"{text_all}", metadata={"title": f"{file_path}"}))
         else:
@@ -158,6 +164,7 @@ def parse_file_documents(file_path):
             for check in chunks:
                 documents.append(Doc(page_content=f"{check}", metadata={"title": f"{file_path}"}))
 
+        logger.info("documents: %d" % len(documents))
         return documents
     except Exception as e:
-        print(f"Error is {e}")
+        logger.error(f"Error is {e}")

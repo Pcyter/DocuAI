@@ -1,0 +1,7 @@
+2024-09-19 15:17:13,232 - myLogger - DEBUG - debug
+2024-09-19 15:17:13,232 - myLogger - INFO - info
+2024-09-19 15:17:13,232 - myLogger - WARNING - warn
+2024-09-19 15:17:13,232 - myLogger - ERROR - error
+2024-09-19 15:17:13,232 - myLogger - CRITICAL - critical
+2024-09-19 15:17:36,264 - myLogger - ERROR - ´íÎóobject of type 'NoneType' has no len()
+2024-09-19 15:17:36,265 - myLogger - ERROR - None
